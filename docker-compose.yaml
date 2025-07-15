@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  nexus:
+    image: sonatype/nexus3:latest  # Gunakan image Nexus 3 terbaru
+    container_name: nexus
+    restart: unless-stopped
+    ports:
+      - "8081:8081"  # Port untuk mengakses Nexus UI
+      - "8082:8082"  # Docker registry
+    volumes:
+      - ./nexus-data:/nexus-data:Z  # Volume untuk menyimpan data Nexus secara persisten
+    environment:
+      - INSTALL4J_ADD_VM_PARAMS=-Xms2703m -Xmx2703m -XX:MaxDirectMemorySize=2703m -Dnexus.script.allowCreation=true
+    networks:
+      - nexus-network
+  fastapi-automasi-nexus-cleaner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fastapi-automasi-nexus-cleaner
+    restart: always
+    ports:
+      - "8000:8000"
+    networks:
+      - nexus-network
+
+volumes:
+  nexus-data:  # Volume untuk data Nexus
+networks:
+  nexus-network:  # Network khusus untuk Nexus
